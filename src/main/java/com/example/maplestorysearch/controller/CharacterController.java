@@ -1,13 +1,16 @@
 package com.example.maplestorysearch.controller;
 
 
+import com.example.maplestorysearch.TimeFormatter;
+import com.example.maplestorysearch.dto.CharacterBasicDTO;
 import com.example.maplestorysearch.dto.CharacterDTO;
 import com.example.maplestorysearch.service.CharacterService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,5 +22,22 @@ public class CharacterController {
     @GetMapping("/character/{name}")
     public CharacterDTO getCharacter(@PathVariable String name) {
         return characterService.getCharacter(name);
+    }
+
+    //현재 날짜로부터 딱 1달 전 날짜까지만 오류가 나지 않는 것으로 판단됨, 이유는 모르겠음..
+    @GetMapping("/character/basic")
+    public CharacterBasicDTO getCharacterBasic(@RequestParam String ocid, @RequestParam(required = false) String date) {
+        if(date != null) {
+            LocalDateTime localDateTime = TimeFormatter.toLocalDateTime(date);
+            return characterService.getCharacterBasic(ocid, localDateTime);
+        }
+        else {
+            return characterService.getCharacterBasic(ocid);
+        }
+    }
+
+    @GetMapping("/character/basic/{name}")
+    public CharacterBasicDTO getCharacterBasicByName(@PathVariable String name) {
+        return characterService.getCharacterBasicByName(name);
     }
 }
