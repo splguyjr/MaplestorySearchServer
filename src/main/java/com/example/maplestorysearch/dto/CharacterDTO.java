@@ -1,5 +1,6 @@
 package com.example.maplestorysearch.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,6 @@ public class CharacterDTO {
      * 캐릭터 식별자 ocid
      */
 
-    @SerializedName("ocid")
+    @JsonProperty("ocid")
     private String ocid;
 }
