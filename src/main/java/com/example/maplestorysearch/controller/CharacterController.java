@@ -2,7 +2,7 @@ package com.example.maplestorysearch.controller;
 
 
 import com.example.maplestorysearch.TimeFormatter;
-import com.example.maplestorysearch.dto.*;
+import com.example.maplestorysearch.dto.character.*;
 import com.example.maplestorysearch.service.CharacterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

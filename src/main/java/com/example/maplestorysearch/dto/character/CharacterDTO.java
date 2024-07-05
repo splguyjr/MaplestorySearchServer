@@ -1,4 +1,4 @@
-package com.example.maplestorysearch.dto;
+package com.example.maplestorysearch.dto.character;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;

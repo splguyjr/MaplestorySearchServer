@@ -1,9 +1,8 @@
 package com.example.maplestorysearch.service;
 
-import com.example.maplestorysearch.dto.*;
+import com.example.maplestorysearch.dto.character.*;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;

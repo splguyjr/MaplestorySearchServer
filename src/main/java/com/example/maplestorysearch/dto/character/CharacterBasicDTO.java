@@ -1,4 +1,4 @@
-package com.example.maplestorysearch.dto;
+package com.example.maplestorysearch.dto.character;
 
 import com.example.maplestorysearch.TimeFormatter;
 import com.fasterxml.jackson.annotation.JsonProperty;

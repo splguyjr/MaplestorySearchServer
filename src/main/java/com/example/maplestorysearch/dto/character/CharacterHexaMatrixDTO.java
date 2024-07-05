@@ -1,4 +1,4 @@
-package com.example.maplestorysearch.dto;
+package com.example.maplestorysearch.dto.character;
 
 import com.example.maplestorysearch.TimeFormatter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,35 +10,26 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 캐릭터 HEXA 코어 정보
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @ToString
-public class CharacterStatDTO {
+public class CharacterHexaMatrixDTO {
 
     /**
-     * 조회 기준일 (KST, 일 단위 데이터로 시, 분은 일괄 0으로 표기)
+     * 조회 기준일 (KST)
      */
     @JsonProperty("date")
     private String date;
 
     /**
-     * 캐릭터 직업
+     * HEXA 코어 정보
      */
-    @JsonProperty("character_class")
-    private String characterClass;
-
-    /**
-     * 현재 스탯 정보
-     */
-    @JsonProperty("final_stat")
-    private List<CharacterFinalStatDTO> finalStat;
-
-    /**
-     * 잔여 AP
-     */
-    @JsonProperty("remain_ap")
-    private long remainAp;
+    @JsonProperty("character_hexa_core_equipment")
+    private List<CharacterHexaMatrixEquipmentDTO> characterHexaCoreEquipment;
 
     public LocalDateTime getDate() {
         return date != null
