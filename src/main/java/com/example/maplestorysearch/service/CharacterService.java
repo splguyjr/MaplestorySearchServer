@@ -139,6 +139,42 @@ public class CharacterService {
         return characterHyperStatDTO;
     }
 
+    public CharacterAbilityDTO getCharacterAbility(@NonNull String ocid) {
+        return this.getCharacterAbility(ocid, null);
+    }
+
+    public CharacterAbilityDTO getCharacterAbility(@NonNull String ocid, LocalDateTime localDateTime) {
+        String url = "/maplestory/v1/character/ability";
+        // LocalDateTime이 null이 아닌 경우 date 파라미터 추가
+        if (localDateTime != null) {
+            //2023년 12월 21 이후 정보만 api 조회 가능
+            System.out.println(localDateTime);
+            String date = toDateString(minDate(2023, 12, 21), localDateTime);
+            System.out.println(date);
+            url = UriComponentsBuilder.fromPath(url)
+                    .queryParam("ocid", ocid)
+                    .queryParam("date", date)
+                    .build()
+                    .toString();
+        }
+
+        else {
+            url = String.format("%s?ocid=%s", url, ocid);
+        }
+
+        return restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(CharacterAbilityDTO.class);
+    }
+
+    public CharacterAbilityDTO getCharacterAbilityByName(@NonNull String CharacterName) {
+        CharacterDTO characterDTO = getCharacter(CharacterName);
+        String ocid = characterDTO.getOcid();
+        CharacterAbilityDTO characterAbilityDTO = getCharacterAbility(ocid);
+        return characterAbilityDTO;
+    }
+
     private static LocalDateTime minDate(int year, int month, int day) {
         return LocalDateTime.of(year, month, day, 0, 0, 0, 0);
     }

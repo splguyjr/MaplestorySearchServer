@@ -49,4 +49,11 @@ public class CharacterController {
     public CharacterHyperStatDTO getCharacterHyperStatByName(@PathVariable String name) {
         return characterService.getCharacterHyperStatByName(name);
     }
+
+    @GetMapping("/character/ability/{name}")
+    public CharacterAbilityDTO getCharacterAbilityByName(@PathVariable String name) {
+        return characterService.getCharacterAbilityByName(name);
+    }
+
+
 }
