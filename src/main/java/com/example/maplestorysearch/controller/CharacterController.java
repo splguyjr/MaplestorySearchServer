@@ -7,9 +7,7 @@ import com.example.maplestorysearch.service.CharacterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -58,6 +56,11 @@ public class CharacterController {
     @GetMapping("/character/hexamatrix/{name}")
     public CharacterHexaMatrixDTO getCharacterHexaMatrixByName(@PathVariable String name) {
         return characterService.getCharacterHexaMatrixByName(name);
+    }
+
+    @GetMapping("/character/hexamatrix-stat/{name}")
+    public CharacterHexaMatrixStatDTO getCharacterHexaStatByName(@PathVariable String name) {
+        return characterService.getCharacterHexaStatByName(name);
     }
 
 }
