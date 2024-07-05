@@ -246,6 +246,42 @@ public class CharacterService {
         return characterHexaMatrixStatDTO;
     }
 
+    public CharacterPopularityDTO getCharacterPopularity(@NonNull String ocid) {
+        return this.getCharacterPopularity(ocid, null);
+    }
+
+    public CharacterPopularityDTO getCharacterPopularity(@NonNull String ocid, LocalDateTime localDateTime) {
+        String url = "/maplestory/v1/character/popularity";
+        // LocalDateTime이 null이 아닌 경우 date 파라미터 추가
+        if (localDateTime != null) {
+            //2023년 12월 21 이후 정보만 api 조회 가능
+            System.out.println(localDateTime);
+            String date = toDateString(minDate(2023, 12, 21), localDateTime);
+            System.out.println(date);
+            url = UriComponentsBuilder.fromPath(url)
+                    .queryParam("ocid", ocid)
+                    .queryParam("date", date)
+                    .build()
+                    .toString();
+        }
+
+        else {
+            url = String.format("%s?ocid=%s", url, ocid);
+        }
+
+        return restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(CharacterPopularityDTO.class);
+    }
+
+    public CharacterPopularityDTO getCharacterPopularityByName(@NonNull String CharacterName) {
+        CharacterDTO characterDTO = getCharacter(CharacterName);
+        String ocid = characterDTO.getOcid();
+        CharacterPopularityDTO characterPopularityDTO  = getCharacterPopularity(ocid);
+        return characterPopularityDTO;
+    }
+
     private static LocalDateTime minDate(int year, int month, int day) {
         return LocalDateTime.of(year, month, day, 0, 0, 0, 0);
     }

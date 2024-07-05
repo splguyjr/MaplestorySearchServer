@@ -63,4 +63,9 @@ public class CharacterController {
         return characterService.getCharacterHexaStatByName(name);
     }
 
+    @GetMapping("/character/popularity/{name}")
+    public CharacterPopularityDTO getCharacterPopularityByName(@PathVariable String name) {
+        return characterService.getCharacterPopularityByName(name);
+    }
+
 }
