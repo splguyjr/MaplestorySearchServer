@@ -2,6 +2,8 @@ package com.example.maplestorysearch.service;
 
 import com.example.maplestorysearch.dto.CharacterBasicDTO;
 import com.example.maplestorysearch.dto.CharacterDTO;
+import com.example.maplestorysearch.dto.CharacterFinalStatDTO;
+import com.example.maplestorysearch.dto.CharacterStatDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -67,6 +69,43 @@ public class CharacterService {
         CharacterBasicDTO characterBasicDTO = getCharacterBasic(ocid);
         return characterBasicDTO;
     }
+
+    public CharacterStatDTO getCharacterStat(@NonNull String ocid) {
+        return this.getCharacterStat(ocid, null);
+    }
+
+    public CharacterStatDTO getCharacterStat(@NonNull String ocid, LocalDateTime localDateTime) {
+        String url = "/maplestory/v1/character/stat";
+        // LocalDateTime이 null이 아닌 경우 date 파라미터 추가
+        if (localDateTime != null) {
+            //2023년 12월 21 이후 정보만 api 조회 가능
+            System.out.println(localDateTime);
+            String date = toDateString(minDate(2023, 12, 21), localDateTime);
+            System.out.println(date);
+            url = UriComponentsBuilder.fromPath(url)
+                    .queryParam("ocid", ocid)
+                    .queryParam("date", date)
+                    .build()
+                    .toString();
+        }
+
+        else {
+            url = String.format("%s?ocid=%s", url, ocid);
+        }
+
+        return restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(CharacterStatDTO.class);
+    }
+
+    public CharacterStatDTO getCharacterStatByName(@NonNull String characterName) {
+        CharacterDTO character = getCharacter(characterName);
+        String ocid = character.getOcid();
+        CharacterStatDTO characterStatDTO = getCharacterStat(ocid);
+        return characterStatDTO;
+    }
+
 
     private static LocalDateTime minDate(int year, int month, int day) {
         return LocalDateTime.of(year, month, day, 0, 0, 0, 0);

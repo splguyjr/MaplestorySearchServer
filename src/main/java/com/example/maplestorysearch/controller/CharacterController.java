@@ -4,6 +4,8 @@ package com.example.maplestorysearch.controller;
 import com.example.maplestorysearch.TimeFormatter;
 import com.example.maplestorysearch.dto.CharacterBasicDTO;
 import com.example.maplestorysearch.dto.CharacterDTO;
+import com.example.maplestorysearch.dto.CharacterFinalStatDTO;
+import com.example.maplestorysearch.dto.CharacterStatDTO;
 import com.example.maplestorysearch.service.CharacterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +41,10 @@ public class CharacterController {
     @GetMapping("/character/basic/{name}")
     public CharacterBasicDTO getCharacterBasicByName(@PathVariable String name) {
         return characterService.getCharacterBasicByName(name);
+    }
+
+    @GetMapping("/character/stat/{name}")
+    public CharacterStatDTO getCharacterStatByName(@PathVariable String name) {
+        return characterService.getCharacterStatByName(name);
     }
 }
