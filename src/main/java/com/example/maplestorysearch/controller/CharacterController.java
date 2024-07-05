@@ -55,5 +55,9 @@ public class CharacterController {
         return characterService.getCharacterAbilityByName(name);
     }
 
+    @GetMapping("/character/hexamatrix/{name}")
+    public CharacterHexaMatrixDTO getCharacterHexaMatrixByName(@PathVariable String name) {
+        return characterService.getCharacterHexaMatrixByName(name);
+    }
 
 }
