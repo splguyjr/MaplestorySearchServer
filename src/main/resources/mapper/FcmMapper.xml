@@ -1,0 +1,9 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pushmessage.mapper.FcmMapper">
+    <!-- FCM 전송을 위한 디바이스 정보 조회-->
+    <select id="selectFcmSendList" resultType="FcmSendDeviceDto">
+        SELECT dvc_tkn
+        FROM CharacterExp AND t1.plan_tm BETWEEN DATE_FORMAT(CURRENT_TIME(), '%H:%i:00') AND DATE_FORMAT(CURRENT_TIME(), '%H:%i:59')
+    </select>
+</mapper>
