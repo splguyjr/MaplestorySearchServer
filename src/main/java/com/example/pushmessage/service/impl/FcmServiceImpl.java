@@ -75,4 +75,5 @@ public class FcmServiceImpl implements FcmService {
                         ).build()).validateOnly(false).build();
 
         return om.writeValueAsString(fcmMessageDto);
+    }
 }
