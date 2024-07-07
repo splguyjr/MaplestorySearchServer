@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${db-url}:3306/maplestory?serverTimezone=Asia/Seoul
+    username: ${db-username}
+    password: ${db-password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+api:
+  key: ${api-key}
