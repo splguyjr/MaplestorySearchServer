@@ -13,4 +13,6 @@ public interface CharacterRepository extends JpaRepository<Character, Long> {
 
     @Query("SELECT DISTINCT c.fcmToken FROM Character c")
     List<String> findDistinctFcmTokens();
+
+    Boolean existsCharacterByCharacterName(String characterName);
 }
