@@ -17,5 +17,10 @@ spring:
     scheduling:
       time-zone: Asia/Seoul
 
+spring-doc:
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+
 api:
   key: ${api-key}
