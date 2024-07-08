@@ -57,6 +57,9 @@ public class CharacterExp {
     @ColumnDefault("false")
     private boolean levelUp;
 
+    @Column(name = "character_image")
+    private String characterImage;
+
     @PreUpdate
     public void calculateAverageGrowthRate() {
         double[] exps = {exp7, exp6, exp5, exp4, exp3, exp2, exp1};
