@@ -1,12 +1,13 @@
 package com.example.updatedb.service;
 
 import com.example.maplestorysearch.dto.character.CharacterBasicDTO;
-import com.example.maplestorysearch.dto.character.CharacterStatDTO;
 import com.example.maplestorysearch.service.CharacterService;
 import com.example.updatedb.dto.CharacterExpDTO;
+import com.example.updatedb.dto.CharacterWeekExpDTO;
 import com.example.updatedb.dto.SubscribeCharacterListDTO;
 import com.example.updatedb.entity.Character;
 import com.example.updatedb.entity.CharacterExp;
+import com.example.updatedb.mapper.ExpMapper;
 import com.example.updatedb.repository.CharacterExpRepository;
 import com.example.updatedb.repository.CharacterRepository;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,13 @@ public class CharacterExpService {
     private final CharacterExpRepository characterExpRepository;
     private final CharacterRepository characterRepository;
     private final CharacterService characterService;
+    private final ExpMapper expMapper;
 
-
-    public CharacterExpService(CharacterExpRepository characterExpRepository, RestClient restClient, CharacterRepository characterRepository, CharacterService characterService) {
+    public CharacterExpService(CharacterExpRepository characterExpRepository, RestClient restClient, CharacterRepository characterRepository, CharacterService characterService, ExpMapper expMapper) {
         this.characterExpRepository = characterExpRepository;
         this.characterService = characterService;
         this.characterRepository = characterRepository;
+        this.expMapper = expMapper;
     }
 
 
@@ -112,5 +114,58 @@ public class CharacterExpService {
         return SubscribeCharacterListDTO.builder()
                 .characterList(characterExpDTOList)
                 .build();
+    }
+
+    //특정 디바이스에서 특정 캐릭터 구독시 db에 저장하고, 최근 일주일 간 exp api호출을 통해 긁어옴
+    public void subscribeCharacter(String characterName, String fcmToken) {
+        Character character = new Character();
+        character.setCharacterName(characterName);
+        character.setFcmToken(fcmToken);
+
+        characterRepository.save(character);
+
+        //updateNewCharacterExp메소드를 호출하여 characterExp 객체내 필드 채워넣음
+        CharacterExp characterExp = updateNewCharacterExp(characterName, fcmToken);
+        characterExpRepository.save(characterExp);
+    }
+
+    public CharacterExp updateNewCharacterExp(String characterName, String fcmToken) {
+        Boolean flag = characterRepository.existsCharacterByCharacterName(characterName);
+
+        //이전에 이미 다른 디바이스에서 등록한적이 있는 캐릭터의 경우 api 호출을 줄이기 위해 기존 정보 이용
+        if(flag) {
+            CharacterExp characterExp = characterExpRepository.findByCharacterName(characterName);
+            CharacterExp newCharacterExp = expMapper.createNewCharacterExp(characterExp, fcmToken);
+            return newCharacterExp;
+        }
+
+        //해당 캐릭터를 등록하는 것이 모든 디바이스 통틀어 처음인 경우 api 호출 7번하여 정보 구성
+        else {
+            //일주일전부터 현재까지 순서로 경험치 정보가 저장되어있음
+            CharacterWeekExpDTO characterWeekExpDTO = characterService.getCharacterBasicInWeek(characterName);
+            List<Double> characterExpList = characterWeekExpDTO.expList();//일주일치 경험치
+            String characterImage = characterWeekExpDTO.characterImage();//캐릭터 제일 최근일자 이미지
+
+            CharacterExp characterExp = new CharacterExp();
+
+            characterExp.setCharacterName(characterName);
+            characterExp.setFcmToken(fcmToken);
+            characterExp.setCharacterImage(characterImage);
+            characterExp.setExp7(characterExpList.get(6));
+            characterExp.setExp6(characterExpList.get(5));
+            characterExp.setExp5(characterExpList.get(4));
+            characterExp.setExp4(characterExpList.get(3));
+            characterExp.setExp3(characterExpList.get(2));
+            characterExp.setExp2(characterExpList.get(1));
+            characterExp.setExp1(characterExpList.get(0));
+
+            return characterExp;
+        }
+    }
+
+    public double ExpApiCallByDate(String characterName) {
+        CharacterBasicDTO characterBasicDTO = characterService.getCharacterBasicByName(characterName);
+        String characterExpRate = characterBasicDTO.getCharacterExpRate();
+        return Double.parseDouble(characterExpRate);
     }
 }
