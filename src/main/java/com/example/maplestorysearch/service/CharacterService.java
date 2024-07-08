@@ -1,14 +1,18 @@
 package com.example.maplestorysearch.service;
 
 import com.example.maplestorysearch.dto.character.*;
+import com.example.updatedb.dto.CharacterWeekExpDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Nonnull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -92,6 +96,30 @@ public class CharacterService {
                 .uri(url)
                 .retrieve()
                 .body(CharacterBasicDTO.class);
+    }
+
+    //일주일 간 경험치 정보 호출 api
+    public CharacterWeekExpDTO getCharacterBasicInWeek(@Nonnull String characterName) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+
+        List<Double> expList = new ArrayList<>();
+        String characterImage = null;
+
+        for (LocalDateTime date = oneWeekAgo; !date.isAfter(now); date = date.plusDays(1)) {
+            CharacterBasicDTO characterBasicDTO = getCharacterBasicByName(characterName, date);
+            if(date == now) {
+                characterImage = characterBasicDTO.getCharacterImage();
+            }
+            String expRate = characterBasicDTO.getCharacterExpRate();
+            double exp = Double.parseDouble(expRate);
+            expList.add(exp);
+        }
+
+        return CharacterWeekExpDTO.builder()
+                .expList(expList)
+                .characterImage(characterImage)
+                .build();
     }
 
     public CharacterStatDTO getCharacterStat(@NonNull String ocid) {
