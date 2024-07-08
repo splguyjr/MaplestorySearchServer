@@ -3,6 +3,8 @@ package com.example.updatedb.service;
 import com.example.maplestorysearch.dto.character.CharacterBasicDTO;
 import com.example.maplestorysearch.dto.character.CharacterStatDTO;
 import com.example.maplestorysearch.service.CharacterService;
+import com.example.updatedb.dto.CharacterExpDTO;
+import com.example.updatedb.dto.SubscribeCharacterListDTO;
 import com.example.updatedb.entity.Character;
 import com.example.updatedb.entity.CharacterExp;
 import com.example.updatedb.repository.CharacterExpRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,6 +41,7 @@ public class CharacterExpService {
             CharacterExp characterExp = characterExpRepository.findByCharacterName(characterName);
 
             double todayExpRate = ExpApiCall(characterName);
+            String imageUrl = ImageApiCall(characterName);
 
             if (characterExp != null) {
                 characterExp.setExp7(characterExp.getExp6());
@@ -47,7 +51,7 @@ public class CharacterExpService {
                 characterExp.setExp3(characterExp.getExp2());
                 characterExp.setExp2(characterExp.getExp1());
                 characterExp.setExp1(todayExpRate);
-
+                characterExp.setCharacterImage(imageUrl);
                 // save 메서드 호출 시 @PreUpdate 어노테이션에 의해 calculateAverageGrowthRate 메서드가 자동으로 호출됨
                 characterExpRepository.save(characterExp);
             }
@@ -76,5 +80,37 @@ public class CharacterExpService {
         return Double.parseDouble(characterExpRate);
     }
 
+    public String ImageApiCall(String characterName) {
+        CharacterBasicDTO characterBasicDTO = characterService.getCharacterBasicByName(characterName);
+        String characterImage = characterBasicDTO.getCharacterImage();
+        return characterImage;
+    }
 
+    //특정 fcmToken을 입력으로 받아 해당 디바이스가 구독한 character들의 기본정보(이미지, 닉네임, 경험치) 반환
+    public SubscribeCharacterListDTO getSubscribeCharacterList(String fcmToken) {
+        List<Character> characters = characterRepository.findByFcmToken(fcmToken);
+
+        List<CharacterExpDTO> characterExpDTOList = new ArrayList<>();
+
+        for(Character character : characters) {
+            String characterName = character.getCharacterName();
+            CharacterExp characterExp = characterExpRepository.findByCharacterName(characterName);
+
+            double exp = characterExp.getExp7();
+            String exps = Double.toString(exp);
+            String characterImage = characterExp.getCharacterImage();
+
+            CharacterExpDTO characterExpDTO = CharacterExpDTO.builder()
+                    .characterName(characterName)
+                    .characterImage(characterImage)
+                    .characterExp(exps)
+                    .build();
+
+            characterExpDTOList.add(characterExpDTO);
+        }
+
+        return SubscribeCharacterListDTO.builder()
+                .characterList(characterExpDTOList)
+                .build();
+    }
 }
