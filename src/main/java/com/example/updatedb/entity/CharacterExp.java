@@ -63,7 +63,7 @@ public class CharacterExp {
     @ColumnDefault("false")
     private boolean levelUp;
 
-    @Column(name = "character_image")
+    @Column(name = "character_image", columnDefinition = "TEXT")
     private String characterImage;
 
     @PreUpdate
