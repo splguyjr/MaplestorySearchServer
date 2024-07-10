@@ -100,17 +100,21 @@ public class CharacterService {
 
     //일주일 간 경험치 정보 호출 api
     public CharacterWeekExpDTO getCharacterBasicInWeek(@Nonnull String characterName) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now().minusDays(2);
         LocalDateTime oneWeekAgo = now.minusWeeks(1);
+
+        System.out.printf("now: %s", now);
+        System.out.printf("oneWeekAgo: %s", oneWeekAgo);
 
         List<Double> expList = new ArrayList<>();
         String characterImage = null;
 
         for (LocalDateTime date = oneWeekAgo; !date.isAfter(now); date = date.plusDays(1)) {
+            System.out.println(date);
             CharacterBasicDTO characterBasicDTO = getCharacterBasicByName(characterName, date);
-            if(date == now) {
-                characterImage = characterBasicDTO.getCharacterImage();
-            }
+            System.out.println(characterBasicDTO);
+
+            characterImage = characterBasicDTO.getCharacterImage();
             String expRate = characterBasicDTO.getCharacterExpRate();
             double exp = Double.parseDouble(expRate);
             expList.add(exp);
