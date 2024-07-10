@@ -1,14 +1,18 @@
 package com.example.maplestorysearch.service;
 
 import com.example.maplestorysearch.dto.character.*;
+import com.example.updatedb.dto.CharacterWeekExpDTO;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.Nonnull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -66,6 +70,62 @@ public class CharacterService {
         return characterBasicDTO;
     }
 
+    public CharacterBasicDTO getCharacterBasicByName(@NonNull String characterName, LocalDateTime localDateTime) {
+        String url = "/maplestory/v1/character/basic";
+
+        CharacterDTO character = getCharacter(characterName);
+        String ocid = character.getOcid();
+        // LocalDateTime이 null이 아닌 경우 date 파라미터 추가
+        if (localDateTime != null) {
+            //2023년 12월 21 이후 정보만 api 조회 가능
+            System.out.println(localDateTime);
+            String date = toDateString(minDate(2023, 12, 21), localDateTime);
+            System.out.println(date);
+            url = UriComponentsBuilder.fromPath(url)
+                    .queryParam("ocid", ocid)
+                    .queryParam("date", date)
+                    .build()
+                    .toString();
+        }
+
+        else {
+            url = String.format("%s?ocid=%s", url, ocid);
+        }
+
+        return restClient.get()
+                .uri(url)
+                .retrieve()
+                .body(CharacterBasicDTO.class);
+    }
+
+    //일주일 간 경험치 정보 호출 api
+    public CharacterWeekExpDTO getCharacterBasicInWeek(@Nonnull String characterName) {
+        LocalDateTime now = LocalDateTime.now().minusDays(2);
+        LocalDateTime oneWeekAgo = now.minusWeeks(1);
+
+        System.out.printf("now: %s", now);
+        System.out.printf("oneWeekAgo: %s", oneWeekAgo);
+
+        List<Double> expList = new ArrayList<>();
+        String characterImage = null;
+
+        for (LocalDateTime date = oneWeekAgo; !date.isAfter(now); date = date.plusDays(1)) {
+            System.out.println(date);
+            CharacterBasicDTO characterBasicDTO = getCharacterBasicByName(characterName, date);
+            System.out.println(characterBasicDTO);
+
+            characterImage = characterBasicDTO.getCharacterImage();
+            String expRate = characterBasicDTO.getCharacterExpRate();
+            double exp = Double.parseDouble(expRate);
+            expList.add(exp);
+        }
+
+        return CharacterWeekExpDTO.builder()
+                .expList(expList)
+                .characterImage(characterImage)
+                .build();
+    }
+
     public CharacterStatDTO getCharacterStat(@NonNull String ocid) {
         return this.getCharacterStat(ocid, null);
     }
@@ -101,6 +161,8 @@ public class CharacterService {
         CharacterStatDTO characterStatDTO = getCharacterStat(ocid);
         return characterStatDTO;
     }
+
+
 
     public CharacterHyperStatDTO getCharacterHyperStat(@NonNull String ocid) {
         return this.getCharacterHyperStat(ocid, null);
